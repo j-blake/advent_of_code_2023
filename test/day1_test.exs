@@ -14,7 +14,7 @@ defmodule Day1Test do
     assert Day1.sum_calibration_values("../test/day1/input.txt") === 214
   end
 
-  test "it parses the test input" do
+  test "it sums the puzzle input" do
     assert Day1.sum_calibration_values("day1/input.txt") === 55429
   end
 end
