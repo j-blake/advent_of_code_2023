@@ -121,6 +121,13 @@ defmodule Day2 do
     end)
   end
 
+  defp sum_possible_games(input) do
+    input
+    |> Enum.filter(&possible_game?/1)
+    |> Enum.map(fn {id, _} -> id end)
+    |> Enum.sum()
+  end
+
   defp possible_game?({id, sets}) do
     case Enum.all?(sets, fn set ->
            Enum.all?(set, fn {color, count} ->
@@ -132,25 +139,18 @@ defmodule Day2 do
     end
   end
 
-  defp sum_possible_games(input) do
+  defp sum_minimum_cubes(input) do
     input
-    |> Enum.filter(&possible_game?/1)
-    |> Enum.map(fn {id, _} -> id end)
+    |> Enum.map(&calculate_smallest_cube_count_for_game/1)
+    |> Enum.map(&Enum.product/1)
     |> Enum.sum()
   end
 
-  defp sum_minimum_cubes(input) do
-    input
-    |> Enum.map(fn {_id, sets} ->
-      sets
-      |> Enum.reduce(%{"red" => 0, "green" => 0, "blue" => 0}, fn set, acc ->
-        Map.merge(acc, set, fn _k, v1, v2 ->
-          Enum.max([v1, v2])
-        end)
-      end)
-      |> Map.values()
+  defp calculate_smallest_cube_count_for_game({_id, sets}) do
+    sets
+    |> Enum.reduce(%{"red" => 0, "green" => 0, "blue" => 0}, fn set, acc ->
+      Map.merge(acc, set, fn _k, v1, v2 -> Enum.max([v1, v2]) end)
     end)
-    |> Enum.map(&Enum.product/1)
-    |> Enum.sum()
+    |> Map.values()
   end
 end
