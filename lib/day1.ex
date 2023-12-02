@@ -38,6 +38,34 @@ defmodule Day1 do
 
   Consider your entire calibration document. What is the sum of all of the calibration values?
 
+  Your puzzle answer was 54605.
+
+  The first half of this puzzle is complete! It provides one gold star: *
+
+
+  --- Part Two ---
+
+  Your calculation isn't quite right. It looks like some of the digits are actually spelled out with letters: one, two,
+  three, four, five, six, seven, eight, and nine also count as valid "digits".
+
+  Equipped with this new information, you now need to find the real first and last digit on each line. For example:
+
+  ```
+  two1nine
+  eightwothree
+  abcone2threexyz
+  xtwone3four
+  4nineeightseven2
+  zoneight234
+  7pqrstsixteen
+  ```
+
+  In this example, the calibration values are 29, 83, 13, 24, 42, 14, and 76. Adding these together produces 281.
+
+  What is the sum of all of the calibration values?
+
+  Your puzzle answer was 55429.
+
 
   """
 
@@ -61,19 +89,34 @@ defmodule Day1 do
   end
 
   defp calculate_calibration_value(string) do
+    first =
+      string
+      |> String.replace(Map.keys(@numbers_as_words), fn word -> @numbers_as_words[word] end,
+        global: false
+      )
+      |> handle_parse()
+
+    last =
+      string
+      |> String.reverse()
+      |> String.replace(
+        Enum.map(Map.keys(@numbers_as_words), fn word -> String.reverse(word) end),
+        fn word -> @numbers_as_words[String.reverse(word)] end,
+        global: false
+      )
+      |> handle_parse()
+
+    {first, last}
+  end
+
+  defp handle_parse(string) do
     string
     |> String.split("", trim: true)
-    |> Enum.reduce({nil, nil}, fn
-      char, {nil, nil} ->
+    |> Enum.reduce_while(nil, fn
+      char, nil ->
         case parse_char(char) do
-          nil -> {nil, nil}
-          val -> {val, val}
-        end
-
-      char, {first, last} ->
-        case parse_char(char) do
-          nil -> {first, last}
-          val -> {first, val}
+          nil -> {:cont, nil}
+          val -> {:halt, val}
         end
     end)
   end
@@ -88,6 +131,5 @@ defmodule Day1 do
   defp convert_to_int({first, last}) do
     (Integer.to_string(first) <> Integer.to_string(last))
     |> String.to_integer()
-    |> IO.inspect()
   end
 end
