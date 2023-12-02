@@ -39,6 +39,55 @@ defmodule Day1 do
   Consider your entire calibration document. What is the sum of all of the calibration values?
 
 
-
   """
+
+  @numbers_as_words %{
+    "one" => "1",
+    "two" => "2",
+    "three" => "3",
+    "four" => "4",
+    "five" => "5",
+    "six" => "6",
+    "seven" => "7",
+    "eight" => "8",
+    "nine" => "9"
+  }
+
+  def sum_calibration_values(path \\ "day1/sample.txt") do
+    FileHelper.read_file(path)
+    |> Enum.map(&calculate_calibration_value/1)
+    |> Enum.map(&convert_to_int/1)
+    |> Enum.sum()
+  end
+
+  defp calculate_calibration_value(string) do
+    string
+    |> String.split("", trim: true)
+    |> Enum.reduce({nil, nil}, fn
+      char, {nil, nil} ->
+        case parse_char(char) do
+          nil -> {nil, nil}
+          val -> {val, val}
+        end
+
+      char, {first, last} ->
+        case parse_char(char) do
+          nil -> {first, last}
+          val -> {first, val}
+        end
+    end)
+  end
+
+  defp parse_char(char) do
+    case Integer.parse(char) do
+      :error -> nil
+      {int, _rem} -> int
+    end
+  end
+
+  defp convert_to_int({first, last}) do
+    (Integer.to_string(first) <> Integer.to_string(last))
+    |> String.to_integer()
+    |> IO.inspect()
+  end
 end
