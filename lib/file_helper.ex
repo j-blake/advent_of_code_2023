@@ -8,7 +8,7 @@ defmodule FileHelper do
   """
   @spec read_file(String.t()) :: [String.t()]
   def read_file(path) do
-    Path.join([__DIR__, "advent_of_code2023", path])
+    Path.join([__DIR__, path])
     |> File.read!()
     |> String.split("\n")
   end
