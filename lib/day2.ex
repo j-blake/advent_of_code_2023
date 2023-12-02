@@ -50,10 +50,50 @@ defmodule Day2 do
 
   def part_1(path \\ "day2/sample.txt") do
     FileHelper.read_file(path)
+    |> parse_input()
     |> sum_possible_games()
+  end
+
+  defp parse_input(input) do
+    input
+    |> Enum.map(fn row ->
+      String.split(row, ": ")
+    end)
+    |> Enum.map(fn [raw_id, raw_sets] ->
+      id = String.split(raw_id, " ") |> List.last() |> String.to_integer()
+
+      sets =
+        raw_sets
+        |> String.split("; ")
+        |> Enum.map(fn game ->
+          String.split(game, ", ")
+        end)
+        |> Enum.map(fn game ->
+          game
+          |> Enum.map(fn x -> String.split(x, " ") end)
+          |> Enum.map(&List.to_tuple/1)
+          |> Map.new(fn {val, key} -> {key, String.to_integer(val)} end)
+        end)
+
+      {id, sets}
+    end)
+  end
+
+  def possible_game?({id, sets}) do
+    case Enum.all?(sets, fn set ->
+           Enum.all?(set, fn {color, count} ->
+             Map.has_key?(@test_bag, color) && @test_bag[color] >= count
+           end)
+         end) do
+      false -> false
+      true -> id
+    end
   end
 
   def sum_possible_games(input) do
     input
+    |> Enum.filter(&possible_game?/1)
+    |> Enum.map(fn {id, _} -> id end)
+    |> Enum.sum()
   end
 end
